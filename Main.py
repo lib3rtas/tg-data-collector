@@ -3,12 +3,12 @@ from telethon.sync import TelegramClient
 from telethon.tl.functions.messages import GetDialogsRequest
 from telethon.tl.types import InputPeerEmpty
 
-import Constants as crd
+import Constants as const
 
 client = TelegramClient(
             'anon', 
-            crd.credentials['api_id'], 
-            crd.credentials['api_hash']
+            const.credentials['api_id'], 
+            const.credentials['api_hash']
         )
 
 
