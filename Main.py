@@ -2,7 +2,10 @@ from telethon.sync import TelegramClient
 from telethon.tl.functions.messages import GetDialogsRequest
 from telethon.tl.types import InputPeerEmpty
 
+from typing import List
+
 import Constants as const
+from process_group import get_groups_data
 
 client = TelegramClient(
             'anon', 
@@ -12,30 +15,8 @@ client = TelegramClient(
 
 
 async def main():
-    # log into telegram
-    await client.start() # creates .session file for future usage
-
-    #chat = await client.get_entity('https://t.me/a27362672727486747373728')
-    chat = await client.get_entity('https://t.me/joinchat/VfhhtxOgLKILbKrKB4Y3TA')
-    #chat = await client.get_entity('https://t.me/geekschannel')
-    #chat = await client.get_entity('https://t.me/qanon_world')
-
-    print(chat.stringify())
-    #await get_all_messages(chat)
-    #await get_all_participants(chat)
-
-async def get_all_messages(chat):
-    messages = await client.get_messages(chat, None, reverse=True)
-    for message in messages:
-        print(message.stringify())
-
-
-async def get_all_participants(chat):
-    users = await client.get_participants(chat)
-    for user in users:
-        print(user.stringify())
-        #if user.username is not None:
-        #    print(user.username)
+    hints = ["https://t.me/joinchat/VfhhtxOgLKILbKrKB4Y3TA"]
+    await get_groups_data(client, hints)
 
 with client:
     client.loop.run_until_complete(main())

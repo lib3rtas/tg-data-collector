@@ -51,7 +51,7 @@ async def get_groups_data(client: TelegramClient, group_hints: List[str]):
     groups_users_graph = nx.Graph()
 
     for group in group_hints:
-        group_info, users_list, messages_df = process_group(
+        group_info, users_list, messages_df = await process_group(
             group,
             client
         )
@@ -60,22 +60,22 @@ async def get_groups_data(client: TelegramClient, group_hints: List[str]):
         else:
             all_messages_df = pd.concat((all_messages_df, messages_df), axis=0)
 
-        groups_users_graph.add_node('group_' + group_info['chat_id'],
+        groups_users_graph.add_node('group_' + str(group_info['group_id']),
                                     **{
                                         'type': 'group',
                                         'subtype': 'chat',
                                         **group_info,
                                     })
 
-        groups_users_graph.add_nodes_from([('user_' + u['user_id'],
+        groups_users_graph.add_nodes_from([('user_' + str(u['user_id']),
                                             {
                                                 'type': 'user',
                                                 **u,
                                             }) for u in users_list])
 
         groups_users_graph.add_edges_from([(
-            'user_' + u['user_id'],
-            'group_' + group_info['group_id']
+            'user_' + str(u['user_id']),
+            'group_' + str(group_info['group_id'])
         ) for u in users_list])
 
     save_df(all_messages_df, 'group_messages')
