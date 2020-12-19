@@ -1,7 +1,6 @@
 import os
 from typing import List
 from datetime import datetime
-import pytz
 import time
 
 import pandas as pd
@@ -22,25 +21,27 @@ async def process_group(link_hint: str, client: TelegramClient):
         'date_created': group .date,
     }
 
-    date_to = datetime(2020, 12, 17)
+    date_to = datetime(2020, 12, 10)
 
     messages_dict = []
     start_time = time.time()
 
-    utc = pytz.UTC
-    while not messages_dict or utc.localize(messages_dict[-1]['timestamp']) > date_to:
+    count = 0
+
+    while not messages_dict or (
+        messages_dict[-1]['timestamp'].replace(tzinfo=None)
+        > date_to.replace(tzinfo=None)
+    ):
+        count +=1
         offset = (
             messages_dict[-1]["timestamp"]
             if messages_dict else None
         )
-        print(f'offset is {offset}')
+        print(f'request nr. {count}, offset is {offset}')
         messages = await client.get_messages(
             group,
-            limit=10,
-            offset_date=(
-                messages_dict[-1]['timestamp']
-                if messages_dict else None
-            ),
+            limit=100,
+            offset_date=offset,
             reverse=False,
         )
         for m in messages:
@@ -61,7 +62,7 @@ async def process_group(link_hint: str, client: TelegramClient):
                 })
 
     print(f'Fetched {len(messages_dict)} messages in'
-            '{time.time() - start_time} seconds.')
+            f'{time.time() - start_time} seconds.')
 
 
     messages_df = pd.DataFrame(messages_dict)
