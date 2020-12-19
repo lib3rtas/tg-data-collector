@@ -1,11 +1,14 @@
 import os
 from typing import List
+from datetime import datetime
+import pytz
+import time
 
 import pandas as pd
 import networkx as nx
 from telethon.sync import TelegramClient
 
-from utils import save_df, load_df
+from utils import save_df, load_df, serialize_dict
 
 
 async def process_group(link_hint: str, client: TelegramClient):
@@ -19,20 +22,51 @@ async def process_group(link_hint: str, client: TelegramClient):
         'date_created': group .date,
     }
 
-    messages = await client.get_messages(group , None, reverse=True)
-    messages_df = pd.DataFrame([{
-        'message_id': m.id,
-        'user_id': m.from_id.user_id,
-        'group_id': m.peer_id.chat_id,
-        'timestamp': m.date,
-        'message_text': m.message,
-        'fwd_from_chat_id': (
-            m.fwd_from.from_id.channel_id
-            if m.fwd_from is not None else None
-        ),
-    } for m in messages])
+    date_to = datetime(2020, 12, 17)
 
-    users = await client.get_participants(group )
+    messages_dict = []
+    start_time = time.time()
+
+    utc = pytz.UTC
+    while not messages_dict or utc.localize(messages_dict[-1]['timestamp']) > date_to:
+        offset = (
+            messages_dict[-1]["timestamp"]
+            if messages_dict else None
+        )
+        print(f'offset is {offset}')
+        messages = await client.get_messages(
+            group,
+            limit=10,
+            offset_date=(
+                messages_dict[-1]['timestamp']
+                if messages_dict else None
+            ),
+            reverse=False,
+        )
+        for m in messages:
+            if m.from_id is not None:
+                fwd_from_id = None
+                if m.fwd_from is not None:
+                    if hasattr(m.fwd_from.from_id, 'user_id'):
+                        fwd_from_id = m.fwd_from.from_id.user_id
+                    elif hasattr(m.fwd_from.from_id, 'channel_id'):
+                        fwd_from_id = m.fwd_from.from_id.channel_id
+                messages_dict.append({
+                    'message_id': m.id,
+                    'user_id': m.from_id.user_id,
+                    'group_id': group.id,
+                    'timestamp': m.date,
+                    'message_text': m.message,
+                    'fwd_from_chat_id': fwd_from_id,
+                })
+
+    print(f'Fetched {len(messages_dict)} messages in'
+            '{time.time() - start_time} seconds.')
+
+
+    messages_df = pd.DataFrame(messages_dict)
+
+    users = await client.get_participants(group)
     users_list = [{
         'user_id': u.id,
         'bot': u.bot,
@@ -64,13 +98,13 @@ async def get_groups_data(client: TelegramClient, group_hints: List[str]):
                                     **{
                                         'type': 'group',
                                         'subtype': 'chat',
-                                        **group_info,
+                                        **serialize_dict(group_info),
                                     })
 
         groups_users_graph.add_nodes_from([('user_' + str(u['user_id']),
                                             {
                                                 'type': 'user',
-                                                **u,
+                                                **serialize_dict(u),
                                             }) for u in users_list])
 
         groups_users_graph.add_edges_from([(

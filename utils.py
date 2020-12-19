@@ -17,3 +17,13 @@ def load_df(dataset_name: str) -> pd.DataFrame:
     )
     return df
 
+
+def serialize_dict(input: dict):
+    result = {}
+    for key, value in input.items():
+        if value is None:
+            value = ''
+        elif isinstance(value, datetime):
+            value = value.strftime("%Y-%m-%dT%H:%M:%SZ")
+        result[key] = value
+    return result
