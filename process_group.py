@@ -161,10 +161,10 @@ async def get_groups_data(client: TelegramClient, group_hints: List[str]):
                     continue
 
                 print('\033[92m' + 'finished group ' + group + '\033[0m', flush=True)
-                print("sleeping for 30 seconds...", flush=True)
+                print("sleeping for 60 seconds...", flush=True)
                 not_finished_group = False
                 timer = 300
-                time.sleep(30)
+                time.sleep(60)
             except (FloodWaitError, RPCError) as e:
                 print(e, flush=True)
                 print('\033[91m' + 'data scraping for ' +
