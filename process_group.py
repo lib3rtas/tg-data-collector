@@ -36,7 +36,7 @@ async def process_group(link_hint: str, client: TelegramClient):
 
     # exit here if it is a channel
     if group_info['broadcast']:
-        return group_info, None, None
+        return group_info, None, None, None
 
     # message processing
     messages_dict = []
