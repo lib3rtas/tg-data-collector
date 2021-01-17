@@ -5,6 +5,7 @@ import time
 import re
 import pandas as pd
 import networkx as nx
+from telethon.errors import FloodWaitError, RPCError
 from telethon.sync import TelegramClient
 
 from utils import serialize_dict, save_df
@@ -30,14 +31,14 @@ async def process_group(
         'participants_count': group.participants_count,
         'date_created': group.date,
     }
-    print(f'Processing group {group_info["title"]}')
-    print("sleeping for 30 seconds...")
+    print(f'Processing group {group_info["title"]}', flush=True)
+    print("sleeping for 30 seconds...", flush=True)
     time.sleep(30)
     # message processing
     messages_dict = []
     messages = await client.get_messages(
         group,
-        10000,
+        3000,
         reverse=False,
     )
     for m in messages:
@@ -65,8 +66,8 @@ async def process_group(
     messages_df = pd.DataFrame(messages_dict)
     save_df(messages_df, 'group_'+str(group_info['group_id']))
 
-    print("sleeping for 120 seconds...")
-    time.sleep(120)
+    print("sleeping for 30 seconds...", flush=True)
+    time.sleep(30)
     # user processing
     messages_user_count = messages_df['user_id'].value_counts()
     users = await client.get_participants(group)
@@ -88,25 +89,42 @@ async def get_groups_data(client: TelegramClient, group_hints: List[str]):
     await client.start()  # creates .session file for login in future
 
     for group in group_hints:
-        try:
-            print('started data scraping for' + group)
-            group_info, users_list, messages_df = await process_group(group, client)
-            print('finished data scraping for' + group)
-            print('starting normal graph processing for' + group)
-            assemble_users_group_graph(group_info, users_list)
-            print('starting multi graph processing for' + group)
-            assemble_users_messages_group_multi_graph(
-                group_info, users_list, messages_df)
-            print('\033[92m' + 'finished group ' + group + '\033[0m')
-            print("sleeping for 5 minutes...")
-            time.sleep(300)
+        not_finished_group = True
+        timer = 300
+        while(not_finished_group):
+            not_finished_group = True
+            try:
+                print('started data scraping for' + group, flush=True)
+                group_info, users_list, messages_df = await process_group(group, client)
+                print('finished data scraping for' + group, flush=True)
+                print('starting normal graph processing for' + group)
+                assemble_users_group_graph(group_info, users_list)
+                print('starting multi graph processing for' + group, flush=True)
+                assemble_users_messages_group_multi_graph(
+                    group_info, users_list, messages_df)
+                print('\033[92m' + 'finished group ' + group + '\033[0m', flush=True)
+                print("sleeping for 30 seconds...", flush=True)
+                not_finished_group = False
+                timer = 60
+                time.sleep(30)
+            except (FloodWaitError, RPCError) as e:
+                print(e, flush=True)
+                print('\033[91m' + 'data scraping for ' +
+                      group + ' failed because of FloodWait or RPC Error' + '\033[0m', flush=True)
+                print(f"sleeping for {timer} seconds...", flush=True)
+                time.sleep(timer)
+                timer *= 2
+            except Exception as e:
+                print(e, flush=True)
+                print('\033[91m' + 'data scraping for ' +
+                      group + ' failed due to unknown Error' + '\033[0m', flush=True)
+                print("\033[91m aborting group...\033[0m", flush=True)
+                not_finished_group = False
 
-        except:
-            print('\033[91m' + 'data scraping for ' +
-                  group + ' failed' + '\033[0m')
+
 
     print('processed all groups')
-    print('finishing....')
+    print('finishing....', flush=True)
     return
 
 
