@@ -108,7 +108,7 @@ async def process_channel(client: TelegramClient, link_hint: str):
     messages_dict = []
     messages = await client.get_messages(
         channel,
-        6000,
+        3000,
         reverse=False,
     )
     for m in messages:
