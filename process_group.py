@@ -105,54 +105,6 @@ async def process_group(
     return group_info
 
 
-#async def process_channel(client: TelegramClient, link_hint: str):
-#    # channel info processing
-#    channel = await client.get_entity(link_hint)
-#    channel_info = {
-#        'channel_id': channel.id,
-#        'title': channel.title,
-#        'participants_count': channel.participants_count,
-#        'date_created': channel.date,
-#        'broadcast': channel.broadcast,
-#        'megagroup': channel.megagroup
-#    }
-#    print(f'Processing channel {channel_info["title"]}', flush=True)
-#    print("sleeping for 30 seconds...", flush=True)
-#    time.sleep(30)
-#
-#    # message processing
-#    messages_dict = []
-#    messages = await client.get_messages(
-#        channel,
-#        3000,
-#        reverse=False,
-#    )
-#    for m in messages:
-#        fwd_from_id = None
-#        if m.fwd_from is not None:
-#            if hasattr(m.fwd_from.from_id, 'channel_id'):
-#                fwd_from_id = m.fwd_from.from_id.channel_id
-#            messages_dict.append({
-#                'message_id': m.id,
-#                'channel_id': channel.id,
-#                'timestamp': m.date,
-#                'message_text': m.message,
-#                'fwd_from_chat_id': fwd_from_id,
-#    })
-#    print("sleeping for 30 seconds...", flush=True)
-#    time.sleep(30)
-#
-#    messages_df = pd.DataFrame(messages_dict)
-#
-#    channel_info['messages_count'] = messages_df.shape[0]
-#
-#    save_df(messages_df, f'{channel.id}_messages')
-#
-#    append_to_df(channel_info, 'groups_info')
-#
-#    return messages_dict
-
-
 def get_groups_data(group_hints: List):
     # Clean group hints
 
