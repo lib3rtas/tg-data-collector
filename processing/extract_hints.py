@@ -54,5 +54,7 @@ link_df_agg = me_links_df.groupby('link').agg({
 })
 link_df_agg.sort_values('group', ascending=False, inplace=True)
 
+hint_list = link_df_agg['link'].tolist()
+link_df_agg.reset_index(drop=True).to_csv('nice2')
 
-get_groups_data(link_df_agg['link'].tolist())
+get_groups_data(hint_list)

@@ -7,7 +7,7 @@ from datetime import datetime
 def save_df(df: pd.DataFrame, title: str):
     timestamp = datetime.now().strftime("%d-%m-%Y_%H.%M")
     filename = f'{title}_{timestamp}.feather'
-    df.reset_index().to_feather(os.path.join('data', filename))
+    df.reset_index(drop=True).to_feather(os.path.join('data', filename))
     return filename
 
 
@@ -39,6 +39,7 @@ def append_to_df(input_dict: Dict, filename: str) -> pd.DataFrame:
     df.reset_index(drop=True).to_feather(filepath)
 
     return df
+
 
 
 def serialize_dict(input: dict):
