@@ -1,0 +1,54 @@
+Started data scraping for @yellowroses2Q2Q
+Traceback (most recent call last):
+  File "/home/fyodor/.cache/pypoetry/virtualenvs/tg-data-collector-yTJ2GlrZ-py3.8/lib/python3.8/site-packages/telethon/client/users.py", line 548, in _get_entity_from_string
+    result = await self(
+  File "/home/fyodor/.cache/pypoetry/virtualenvs/tg-data-collector-yTJ2GlrZ-py3.8/lib/python3.8/site-packages/telethon/client/users.py", line 30, in __call__
+    return await self._call(self._sender, request, ordered=ordered)
+  File "/home/fyodor/.cache/pypoetry/virtualenvs/tg-data-collector-yTJ2GlrZ-py3.8/lib/python3.8/site-packages/telethon/client/users.py", line 79, in _call
+    result = await future
+telethon.errors.rpcerrorlist.UsernameNotOccupiedError: The username is not in use by anyone else yet (caused by ResolveUsernameRequest)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/fyodor/Documents/studium-module/sna/projekt/tg-data-collector/process_group.py", line 175, in get_groups_data_async
+    await process_group(group, client)
+  File "/home/fyodor/Documents/studium-module/sna/projekt/tg-data-collector/process_group.py", line 30, in process_group
+    group = await client.get_entity(link_hint)
+  File "/home/fyodor/.cache/pypoetry/virtualenvs/tg-data-collector-yTJ2GlrZ-py3.8/lib/python3.8/site-packages/telethon/client/users.py", line 330, in get_entity
+    result.append(await self._get_entity_from_string(x))
+  File "/home/fyodor/.cache/pypoetry/virtualenvs/tg-data-collector-yTJ2GlrZ-py3.8/lib/python3.8/site-packages/telethon/client/users.py", line 551, in _get_entity_from_string
+    raise ValueError('No user has "{}" as username'
+ValueError: No user has "yellowroses2q2q" as username
+[ INFO/2021-01-18 22:53:31,309] telethon.network.mtprotosender: Disconnecting from 149.154.167.91:443/TcpFull...
+[ INFO/2021-01-18 22:53:31,310] telethon.network.mtprotosender: Disconnection from 149.154.167.91:443/TcpFull complete!
+Error No user has "yellowroses2q2q" as username in group @yellowroses2Q2Q
+Traceback (most recent call last):
+  File "/home/fyodor/.cache/pypoetry/virtualenvs/tg-data-collector-yTJ2GlrZ-py3.8/lib/python3.8/site-packages/telethon/client/users.py", line 548, in _get_entity_from_string
+    result = await self(
+  File "/home/fyodor/.cache/pypoetry/virtualenvs/tg-data-collector-yTJ2GlrZ-py3.8/lib/python3.8/site-packages/telethon/client/users.py", line 30, in __call__
+    return await self._call(self._sender, request, ordered=ordered)
+  File "/home/fyodor/.cache/pypoetry/virtualenvs/tg-data-collector-yTJ2GlrZ-py3.8/lib/python3.8/site-packages/telethon/client/users.py", line 79, in _call
+    result = await future
+telethon.errors.rpcerrorlist.UsernameNotOccupiedError: The username is not in use by anyone else yet (caused by ResolveUsernameRequest)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/fyodor/Documents/studium-module/sna/projekt/tg-data-collector/groups_manual_dl.py", line 204, in <module>
+    get_groups_data(hints)
+  File "/home/fyodor/Documents/studium-module/sna/projekt/tg-data-collector/process_group.py", line 164, in get_groups_data
+    client.loop.run_until_complete(
+  File "/home/fyodor/.pyenv/versions/3.8.6/lib/python3.8/asyncio/base_events.py", line 616, in run_until_complete
+    return future.result()
+  File "/home/fyodor/Documents/studium-module/sna/projekt/tg-data-collector/process_group.py", line 175, in get_groups_data_async
+    await process_group(group, client)
+  File "/home/fyodor/Documents/studium-module/sna/projekt/tg-data-collector/process_group.py", line 30, in process_group
+    group = await client.get_entity(link_hint)
+  File "/home/fyodor/.cache/pypoetry/virtualenvs/tg-data-collector-yTJ2GlrZ-py3.8/lib/python3.8/site-packages/telethon/client/users.py", line 330, in get_entity
+    result.append(await self._get_entity_from_string(x))
+  File "/home/fyodor/.cache/pypoetry/virtualenvs/tg-data-collector-yTJ2GlrZ-py3.8/lib/python3.8/site-packages/telethon/client/users.py", line 551, in _get_entity_from_string
+    raise ValueError('No user has "{}" as username'
+ValueError: No user has "yellowroses2q2q" as username
+
+Process finished with exit code 1
