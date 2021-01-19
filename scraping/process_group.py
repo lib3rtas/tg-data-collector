@@ -31,7 +31,13 @@ async def process_group(
         processed_groups_ids: List[str]
 ) -> Optional[Dict]:
     # group info processing
-    group = await client.get_entity(link_hint)
+    try:
+        group = await client.get_entity(link_hint)
+    except Exception as e:
+        print(f'Exception {str(e)} when getting group info of {link_hint},'
+              f'skipping.')
+        return
+
     if group.id in processed_groups_ids:
         print(f'Skipping {link_hint} as it was already processed.')
         return
@@ -110,7 +116,8 @@ def get_groups_data(group_hints: List):
 
     logging.basicConfig(
         format='[%(levelname) 5s/%(asctime)s] %(name)s: %(message)s',
-        level=logging.INFO)
+        level=logging.INFO
+    )
 
     client = TelegramClient(
         'anon',
@@ -126,8 +133,10 @@ async def get_groups_data_async(client: TelegramClient, group_hints: List[str]):
     await client.start()  # creates .session file for login in future
 
     # Get already processed groups once.
-    df_processed = load_df('groups_info')
-    processed_group_ids = df_processed['group_id'].tolist()
+    processed_group_ids = []
+    if os.path.exists(os.path.join('../data', 'groups_info')):
+        df_processed = load_df('groups_info')
+        processed_group_ids = df_processed['group_id'].tolist()
 
 
     for group in group_hints:

@@ -1,4 +1,4 @@
-from process_group import get_groups_data
+from scraping.process_group import get_groups_data
 
 
 hints = [
