@@ -13,7 +13,6 @@ import Constants as const
 from telethon.sync import TelegramClient
 from utils import serialize_dict, save_df, append_to_df, load_df
 
-
 block_errors = True
 
 
@@ -100,7 +99,7 @@ async def process_group(
             'deleted': u.deleted,
             'verified': u.verified,
             'nr_of_messages': calc_nr_of_messages_per_user(
-                    u.id, messages_user_count),
+                u.id, messages_user_count),
         } for u in users])
         if group_info['participants_count'] is None:
             group_info['participants_count'] = users_df.shape[0]
@@ -137,7 +136,6 @@ async def get_groups_data_async(client: TelegramClient, group_hints: List[str]):
     if os.path.exists(os.path.join('../data', 'groups_info')):
         df_processed = load_df('groups_info')
         processed_group_ids = df_processed['group_id'].tolist()
-
 
     for group in group_hints:
         timer = 300
