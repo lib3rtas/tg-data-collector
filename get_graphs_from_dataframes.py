@@ -166,7 +166,7 @@ def generate_one_mode_users_graph(groups_info_df, users_df, messages_df):
 
     nodes = []
     for node in tmp_graph.nodes.data():
-        if node[1]['type'] == 'user' and node[1]['nr_of_messages'] > 0:
+        if node[1]['type'] == 'user' and node[1]['nr_of_messages'] > 1:
             nodes.append(node[0])
 
     print(len(nodes))
