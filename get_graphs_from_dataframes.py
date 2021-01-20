@@ -29,7 +29,7 @@ def import_dataframes():
 
 def calc_nr_of_messages_per_user(user_id, messages_user_count):
     try:
-        nr_of_messages = messages_user_count[user_id]+1
+        nr_of_messages = messages_user_count[user_id] + 1
         return nr_of_messages
     except:
         # was 0 before, but gephi does not accept edges with zero weight
@@ -132,41 +132,40 @@ def generate_one_mode_users_graph(groups_info_df, users_df, messages_df):
     messages_user_count = messages_df['user_id'].value_counts()
 
     for index, group in groups_info_df.iterrows():
-        tmp_graph.add_node(
-            'group_' + str(group['group_id']),
-            **{
-                'type': 'group',
-                'subtype': 'chat',
-                **serialize_dict(group),
-            },
-            bipartite=0
-        )
-    bottom_nodes = []
-    for node in tmp_graph.nodes:
-        bottom_nodes.append(node)
+        if group['megagroup']:
+            tmp_graph.add_node(
+                'group_' + str(group['group_id']),
+                **{
+                    'type': 'group',
+                    'subtype': 'chat',
+                    **serialize_dict(group),
+                },
+                bipartite=0
+            )
 
     for index, user in tqdm(users_df.iterrows()):
-        tmp_graph.add_node(
-            'user_' + str(user['user_id']),
-            **{
-                'type': 'user',
-                'nr_of_message': calc_nr_of_messages_per_user(user['user_id'], messages_user_count),
-                **serialize_dict(user),
-            },
-            bipartite=1
-        )
-        tmp_graph.add_weighted_edges_from(
-            [(
+        if (users_df['user_id'] == user['user_id']).sum() > 3:
+            tmp_graph.add_node(
                 'user_' + str(user['user_id']),
-                'group_' + str(user['group_id']),
-                calc_nr_of_messages_per_user(user['user_id'], messages_user_count)
-            )],
-            group_title=get_group_title(user['group_id'], groups_info_df),
-        )
+                **{
+                    'type': 'user',
+                    'nr_of_message': calc_nr_of_messages_per_user(user['user_id'], messages_user_count),
+                    **serialize_dict(user),
+                },
+                bipartite=1
+            )
+            tmp_graph.add_weighted_edges_from(
+                [(
+                    'user_' + str(user['user_id']),
+                    'group_' + str(user['group_id']),
+                    calc_nr_of_messages_per_user(user['user_id'], messages_user_count)
+                )],
+                group_title=get_group_title(user['group_id'], groups_info_df),
+            )
 
     nodes = []
     for node in tmp_graph.nodes.data():
-        if node[1]['type'] == 'user' and node[1]['nr_of_messages'] > 1:
+        if node[1]['type'] == 'user': #and tmp_graph.degree(node[0]) > 1:
             nodes.append(node[0])
 
     print(len(nodes))
@@ -188,7 +187,7 @@ if __name__ == '__main__':
     # drop columns that are not useful, duplicates or just implicitly in the network
     groups_info_df.drop(['participants_count'], axis=1, inplace=True)
     messages_df.drop(['fwd_from_chat_id'], axis=1, inplace=True)
-    messages_df.drop(['level_0'], axis=1, inplace=True)
+    users_df.drop(['level_0'], axis=1, inplace=True)
 
     # fill all NA fields with empty string
     users_df['first_name'] = users_df['first_name'].fillna('')
@@ -208,9 +207,9 @@ if __name__ == '__main__':
     print(users_df.shape)
     print(messages_df.shape)
 
-    bipartite_graph = generate_bipartite_graph(groups_info_df, users_df, messages_df)
-    export_bipartite_graph(bipartite_graph)
-    one_mode_groups_graph = generate_one_mode_groups_graph(groups_info_df, users_df, messages_df)
-    export_one_mode_graph(one_mode_groups_graph)
+    # bipartite_graph = generate_bipartite_graph(groups_info_df, users_df, messages_df)
+    # export_bipartite_graph(bipartite_graph)
+    # one_mode_groups_graph = generate_one_mode_groups_graph(groups_info_df, users_df, messages_df)
+    # export_one_mode_graph(one_mode_groups_graph)
     one_mode_groups_graph = generate_one_mode_users_graph(groups_info_df, users_df, messages_df)
     export_one_mode_graph(one_mode_groups_graph)
